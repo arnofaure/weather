@@ -145,6 +145,7 @@ html, body {
 }
 .item { display: flex; align-items: center; gap: calc(8 * var(--b)); }
 .item[hidden] { display: none; }
+#later svg { width: calc(50 * var(--b)); height: calc(50 * var(--b)); } /* rain/snow/storm later today: draws smaller */
 .item svg {
   width: calc(42 * var(--b));
   height: calc(42 * var(--b));

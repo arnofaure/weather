@@ -23,8 +23,8 @@
 
   function forecastUrl() {
     return 'https://api.open-meteo.com/v1/forecast?latitude=' + LAT + '&longitude=' + LON +
-      '&current=apparent_temperature&hourly=apparent_temperature' +
-      '&daily=weather_code,apparent_temperature_max&timezone=America%2FToronto&past_days=1&forecast_days=1';
+      '&current=apparent_temperature,weather_code&hourly=apparent_temperature,weather_code' +
+      '&daily=apparent_temperature_max&timezone=America%2FToronto&past_days=1&forecast_days=1';
   }
 
   function roundOrNull(v) {
@@ -53,21 +53,40 @@
 
   // Index of today in the daily arrays: with past_days=1 the first entry is yesterday.
   function todayIndex(daily, isoLocal) {
+    if (!daily) return -1;
     if (!Array.isArray(daily.time)) return 0;
     return daily.time.indexOf(String(isoLocal).slice(0, 10));
   }
 
+  // Rain, snow or storm coming in the rest of today (hours after the current one), when it is not the weather now.
+  // Storm beats snow beats rain. Fog, cloud and sun are not announced.
+  var LATER_RANK = { rain: 1, snow: 2, storm: 3 };
+  function laterToday(hourly, isoLocal, nowType) {
+    if (!hourly || !Array.isArray(hourly.time) || !Array.isArray(hourly.weather_code)) return null;
+    var today = String(isoLocal).slice(0, 10), hourNow = String(isoLocal).slice(0, 13);
+    var best = null;
+    hourly.time.forEach(function (t, k) {
+      t = String(t);
+      if (t.slice(0, 10) !== today || t.slice(0, 13) <= hourNow) return;
+      var type = wmoToClip(hourly.weather_code[k]);
+      if (LATER_RANK[type] && (!best || LATER_RANK[type] > LATER_RANK[best])) best = type;
+    });
+    return best === nowType ? null : best;
+  }
+
   function parseForecast(json) {
-    if (!json || !json.current || !json.daily || !Array.isArray(json.daily.weather_code)) return null;
+    if (!json || !json.current) return null;
     var cur = json.current, daily = json.daily;
     var date = formatDate(cur.time);
-    var i = todayIndex(daily, cur.time);
-    if (date === null || i < 0) return null;
-    var code = daily.weather_code[i];
+    if (date === null) return null;
+    // The character shows the weather now (owner, 2026-11-27), like the feels-like number.
+    var code = cur.weather_code;
     // Every temperature shown is a feels-like one (owner rule): no actual temperature, not even as a fallback.
     var feels = roundOrNull(cur.apparent_temperature);
     if (code === null || code === undefined || feels === null) return null;
-    var maxes = daily.apparent_temperature_max;
+    var i = todayIndex(daily, cur.time);
+    var maxes = i >= 0 ? daily.apparent_temperature_max : null;
+    var type = wmoToClip(code);
 
     var yFeelsRaw = null, h = json.hourly;
     if (h && Array.isArray(h.time) && Array.isArray(h.apparent_temperature)) {
@@ -78,7 +97,8 @@
       ? roundOrNull(cur.apparent_temperature - yFeelsRaw) : null;
 
     return {
-      type: wmoToClip(code),
+      type: type,
+      later: laterToday(json.hourly, cur.time, type),
       feels: feels,
       max: roundOrNull(Array.isArray(maxes) ? maxes[i] : null),
       yesterdayFeels: roundOrNull(yFeelsRaw),

@@ -3,6 +3,7 @@
 //   ?fake=ok|offline|slow   fixed data / always fail / succeed after 20 s
 //   ?type=rain              force the weather type
 //   ?feels=-35&max=-20&yday=-30   override the feels-like values (with fake=ok; empty = missing)
+//   ?later=rain|snow|storm  with fake=ok: that weather in the afternoon
 //   ?fast=1                 all timers divided by 60
 //   ?debug=1                status line at the bottom left
 (function () {
@@ -35,13 +36,15 @@
   // ------------------------------------------------------------------ data
   function fakeJson() {
     function num(name, dflt) { var v = q.get(name); return v === null ? dflt : (v === '' ? null : Number(v)); }
-    var time = [], feels = [], days = ['2026-12-11', '2026-12-12'];
-    days.forEach(function (d) { for (var h = 0; h < 24; h++) { time.push(d + 'T' + (h < 10 ? '0' : '') + h + ':00'); feels.push(-20); } });
+    var time = [], feels = [], codes = [], days = ['2026-12-11', '2026-12-12'];
+    days.forEach(function (d) { for (var h = 0; h < 24; h++) { time.push(d + 'T' + (h < 10 ? '0' : '') + h + ':00'); feels.push(-20); codes.push(3); } });
     feels[time.indexOf('2026-12-11T08:00')] = num('yday', -6.1);
+    var later = { rain: 63, snow: 73, storm: 95 }[q.get('later')];
+    if (later) codes[time.indexOf('2026-12-12T15:00')] = later;
     return {
-      current: { time: '2026-12-12T08:15', apparent_temperature: num('feels', -9.2) },
-      hourly: { time: time, apparent_temperature: feels },
-      daily: { time: days, weather_code: [61, 3], apparent_temperature_max: [0.4, num('max', -1.6)] }
+      current: { time: '2026-12-12T08:15', apparent_temperature: num('feels', -9.2), weather_code: 3 },
+      hourly: { time: time, apparent_temperature: feels, weather_code: codes },
+      daily: { time: days, apparent_temperature_max: [0.4, num('max', -1.6)] }
     };
   }
 
@@ -140,6 +143,13 @@
   }
 
   // ------------------------------------------------------------------ screen
+  var CLOUD = '<path d="M9.5 19h13a4.5 4.5 0 0 0 .6-9 6.5 6.5 0 0 0-12.4 1.6A3.8 3.8 0 0 0 9.5 19z"/>';
+  var LATER_ICONS = {
+    rain: CLOUD + '<path d="M12 23l-1.5 4M17 23l-1.5 4M22 23l-1.5 4"/>',
+    snow: CLOUD + '<path d="M11.5 24.5h.01M16.5 27h.01M21.5 24.5h.01M14 29h.01M19 29h.01" stroke-width="3.4"/>',
+    storm: CLOUD + '<path d="M17.5 21l-3 4.5h4l-3 4.5"/>'
+  };
+
   function setText(id, t) { document.getElementById(id).textContent = t; }
 
   function showData(d) {
@@ -148,6 +158,10 @@
     setText('max-num', L.formatTemp(d.max) + '°');
     document.getElementById('yday').hidden = d.deltaFeels === null;
     setText('yday-num', L.formatDelta(d.deltaFeels));   // signed: +3°, -3°, =
+    // rain, snow or storm coming later today (the character shows the weather now)
+    var laterIcon = LATER_ICONS[d.later];
+    document.getElementById('later').hidden = !laterIcon;
+    if (laterIcon) document.getElementById('later-icon').innerHTML = laterIcon;
   }
 
   function render() {
