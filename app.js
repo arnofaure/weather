@@ -2,7 +2,7 @@
 // Test hooks in the URL (for the Mac only; the unit opens the page without them):
 //   ?fake=ok|offline|slow   fixed data / always fail / succeed after 20 s
 //   ?type=rain              force the weather type
-//   ?feels=-35&temp=-27&max=-20&yday=-30   override the values (with fake=ok; empty = missing)
+//   ?feels=-35&max=-20&yday=-30   override the feels-like values (with fake=ok; empty = missing)
 //   ?fast=1                 all timers divided by 60
 //   ?debug=1                status line at the bottom left
 (function () {
@@ -39,9 +39,9 @@
     days.forEach(function (d) { for (var h = 0; h < 24; h++) { time.push(d + 'T' + (h < 10 ? '0' : '') + h + ':00'); feels.push(-20); } });
     feels[time.indexOf('2026-12-11T08:00')] = num('yday', -6.1);
     return {
-      current: { time: '2026-12-12T08:15', temperature_2m: num('temp', -5.4), apparent_temperature: num('feels', -9.2) },
+      current: { time: '2026-12-12T08:15', apparent_temperature: num('feels', -9.2) },
       hourly: { time: time, apparent_temperature: feels },
-      daily: { time: days, weather_code: [61, 3], temperature_2m_max: [0.4, num('max', -1.6)] }
+      daily: { time: days, weather_code: [61, 3], apparent_temperature_max: [0.4, num('max', -1.6)] }
     };
   }
 
@@ -143,9 +143,7 @@
   function setText(id, t) { document.getElementById(id).textContent = t; }
 
   function showData(d) {
-    var main = d.feels !== null ? d.feels : d.temp;   // feels-like first; actual temperature only if missing
-    setText('main-num', L.formatTemp(main));
-    document.getElementById('main-label').style.visibility = d.feels !== null ? 'visible' : 'hidden';
+    setText('main-num', L.formatTemp(d.feels));        // all temperatures are feels-like
     document.getElementById('max').hidden = d.max === null;
     setText('max-num', L.formatTemp(d.max) + '°');
     document.getElementById('yday').hidden = d.deltaFeels === null;

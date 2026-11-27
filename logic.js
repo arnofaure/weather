@@ -23,8 +23,8 @@
 
   function forecastUrl() {
     return 'https://api.open-meteo.com/v1/forecast?latitude=' + LAT + '&longitude=' + LON +
-      '&current=temperature_2m,apparent_temperature&hourly=apparent_temperature' +
-      '&daily=weather_code,temperature_2m_max&timezone=America%2FToronto&past_days=1&forecast_days=1';
+      '&current=apparent_temperature&hourly=apparent_temperature' +
+      '&daily=weather_code,apparent_temperature_max&timezone=America%2FToronto&past_days=1&forecast_days=1';
   }
 
   function roundOrNull(v) {
@@ -64,10 +64,10 @@
     var i = todayIndex(daily, cur.time);
     if (date === null || i < 0) return null;
     var code = daily.weather_code[i];
+    // Every temperature shown is a feels-like one (owner rule): no actual temperature, not even as a fallback.
     var feels = roundOrNull(cur.apparent_temperature);
-    var temp = roundOrNull(cur.temperature_2m);
-    if (code === null || code === undefined || (feels === null && temp === null)) return null;
-    var maxes = daily.temperature_2m_max;
+    if (code === null || code === undefined || feels === null) return null;
+    var maxes = daily.apparent_temperature_max;
 
     var yFeelsRaw = null, h = json.hourly;
     if (h && Array.isArray(h.time) && Array.isArray(h.apparent_temperature)) {
@@ -80,7 +80,6 @@
     return {
       type: wmoToClip(code),
       feels: feels,
-      temp: temp,
       max: roundOrNull(Array.isArray(maxes) ? maxes[i] : null),
       yesterdayFeels: roundOrNull(yFeelsRaw),
       deltaFeels: delta,
