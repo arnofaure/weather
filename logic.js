@@ -93,6 +93,14 @@
     return String(r === 0 ? 0 : r);
   }
 
+  // change since yesterday: always signed ("+3°", "-3°"), "=" when equal, "" when missing
+  function formatDelta(n) {
+    if (typeof n !== 'number' || !isFinite(n)) return '';
+    var r = Math.round(n);
+    if (r === 0) return '=';
+    return (r > 0 ? '+' : '') + r + '°';
+  }
+
   // clips: file names like "rain-2.mp4" or "rain.mp4". Random variant of the type, else unknown, else null.
   function pickClip(type, clips, rand) {
     function ofType(t) {
@@ -113,7 +121,7 @@
   }
 
   var api = {
-    wmoToClip: wmoToClip, forecastUrl: forecastUrl, parseForecast: parseForecast, formatTemp: formatTemp,
+    wmoToClip: wmoToClip, forecastUrl: forecastUrl, parseForecast: parseForecast, formatTemp: formatTemp, formatDelta: formatDelta,
     formatDate: formatDate, yesterdayHour: yesterdayHour, pickClip: pickClip, screenState: screenState,
     STARTUP_GRACE_MS: STARTUP_GRACE_MS, MAX_DATA_AGE_MS: MAX_DATA_AGE_MS
   };

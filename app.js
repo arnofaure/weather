@@ -150,7 +150,7 @@
     if (d.deltaFeels !== null) {
       var arrow = document.getElementById('yday-arrow');
       arrow.setAttribute('class', 'arrow ' + (d.deltaFeels < 0 ? 'down' : d.deltaFeels > 0 ? 'up' : 'same'));
-      setText('yday-num', d.deltaFeels === 0 ? '=' : Math.abs(d.deltaFeels) + '°');
+      setText('yday-num', L.formatDelta(d.deltaFeels));
     }
   }
 
