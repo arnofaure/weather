@@ -151,15 +151,16 @@ html, body {
 
 /* corner items: out of the centred flow */
 .corner { left: auto; right: var(--side-x); text-align: right; }
-/* yesterday: top right, on the "feels like" line, smaller and faded but readable */
+/* yesterday: top right, level with the middle of the big number, smaller and faded but readable */
 #yday {
-  top: calc(var(--top-y) + 150 * var(--t) - 6 * var(--t));
+  top: calc(var(--top-y) + 75 * var(--t));
+  transform: translateY(-50%);
   font-size: calc(34 * var(--b));
 }
 #yday svg { width: calc(30 * var(--b)); height: calc(30 * var(--b)); }
 .state-weather #yday { opacity: 0.6; }
-/* later today: bottom right, arrow then the weather icon */
-#later { bottom: var(--bottom-y); gap: calc(2 * var(--b)); }
+/* later today: next to the max, arrow then the weather icon */
+#later { gap: calc(2 * var(--b)); }
 #later svg { width: calc(50 * var(--b)); height: calc(50 * var(--b)); } /* cloud icons draw smaller */
 #later svg.later-arrow { width: calc(30 * var(--b)); height: calc(30 * var(--b)); }
 .item svg {
