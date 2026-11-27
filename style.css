@@ -28,6 +28,11 @@
   --u: calc(min(100vw, var(--vh) * 0.75) / 768);
   --bottom-scale: 1;
   --top-scale: 1;
+  --t: calc(var(--u) * var(--top-scale));
+  --b: calc(var(--u) * var(--bottom-scale));
+  --top-y: max(calc(22 * var(--u)), calc(env(safe-area-inset-top, 0px) + 6px));
+  --bottom-y: max(calc(40 * var(--u)), calc(env(safe-area-inset-bottom, 0px) + 10px));
+  --side-x: max(calc(30 * var(--u)), calc(env(safe-area-inset-right, 0px) + 14px));
 }
 @supports (height: 100dvh) {
   :root { --vh: 100dvh; }
@@ -105,10 +110,7 @@ html, body {
 }
 
 /* top: feels-like temperature, as high as possible (clear of a phone's notch) */
-#top {
-  --t: calc(var(--u) * var(--top-scale));
-  top: max(calc(22 * var(--u)), calc(env(safe-area-inset-top, 0px) + 6px));
-}
+#top { top: var(--top-y); }
 #main {
   font-size: calc(150 * var(--t));
   font-weight: 650;
@@ -132,20 +134,34 @@ html, body {
 }
 
 /* bottom: today's max, change since yesterday (clear of a phone's home bar) */
-#bottom {
-  --b: calc(var(--u) * var(--bottom-scale));
-  bottom: max(calc(40 * var(--u)), calc(env(safe-area-inset-bottom, 0px) + 10px));
-  display: flex;
-  justify-content: center;
-  gap: calc(56 * var(--b));
+#bottom, .corner {
   font-size: calc(46 * var(--b));
   font-weight: 600;
   color: var(--ink2);
   font-variation-settings: "SOFT" 100, "WONK" 1, "opsz" 72;
 }
+#bottom {
+  bottom: var(--bottom-y);
+  display: flex;
+  justify-content: center;
+  gap: calc(56 * var(--b));
+}
 .item { display: flex; align-items: center; gap: calc(8 * var(--b)); }
 .item[hidden] { display: none; }
-#later svg { width: calc(50 * var(--b)); height: calc(50 * var(--b)); } /* rain/snow/storm later today: draws smaller */
+
+/* corner items: out of the centred flow */
+.corner { left: auto; right: var(--side-x); text-align: right; }
+/* yesterday: top right, on the "feels like" line, smaller and faded but readable */
+#yday {
+  top: calc(var(--top-y) + 150 * var(--t) - 6 * var(--t));
+  font-size: calc(34 * var(--b));
+}
+#yday svg { width: calc(30 * var(--b)); height: calc(30 * var(--b)); }
+.state-weather #yday { opacity: 0.6; }
+/* later today: bottom right, arrow then the weather icon */
+#later { bottom: var(--bottom-y); gap: calc(2 * var(--b)); }
+#later svg { width: calc(50 * var(--b)); height: calc(50 * var(--b)); } /* cloud icons draw smaller */
+#later svg.later-arrow { width: calc(30 * var(--b)); height: calc(30 * var(--b)); }
 .item svg {
   width: calc(42 * var(--b));
   height: calc(42 * var(--b));
