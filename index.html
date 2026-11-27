@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#C5BCB0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Weather">
+<meta name="description" content="Montreal weather, with a clay character.">
+<title>Weather</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="preload" href="fonts/Fraunces-Roman-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="state-waiting">
+  <div id="stage">
+    <video id="v0" class="clip" muted playsinline preload="auto"></video>
+    <video id="v1" class="clip" muted playsinline preload="auto"></video>
+    <img id="offline" src="offline.jpg" alt="">
+    <header id="top" class="text">
+      <div id="main"><span id="main-num"></span><span id="main-unit">°C</span></div>
+      <div id="main-label">feels like</div>
+    </header>
+    <footer id="bottom" class="text">
+      <div id="max" class="item">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M8 6h16M16 27V11M10 17l6-6 6 6"/></svg><span id="max-num"></span>
+      </div>
+      <div id="yday" class="item">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M7 16a9 9 0 1 0 3-6.7"/><path d="M6 5v6h6"/><path d="M16 11v6l4 2"/></svg>
+        <svg id="yday-arrow" class="arrow" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 6v20M9 19l7 7 7-7"/></svg><span id="yday-num"></span>
+      </div>
+    </footer>
+  </div>
+  <div id="debug"></div>
+  <script src="logic.js"></script>
+  <script src="clips.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
