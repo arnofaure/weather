@@ -147,11 +147,7 @@
     document.getElementById('max').hidden = d.max === null;
     setText('max-num', L.formatTemp(d.max) + '°');
     document.getElementById('yday').hidden = d.deltaFeels === null;
-    if (d.deltaFeels !== null) {
-      var arrow = document.getElementById('yday-arrow');
-      arrow.setAttribute('class', 'arrow ' + (d.deltaFeels < 0 ? 'down' : d.deltaFeels > 0 ? 'up' : 'same'));
-      setText('yday-num', L.formatDelta(d.deltaFeels));
-    }
+    setText('yday-num', L.formatDelta(d.deltaFeels));   // signed: +3°, -3°, =
   }
 
   function render() {

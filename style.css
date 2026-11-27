@@ -155,9 +155,6 @@ html, body {
   stroke-linejoin: round;
   filter: drop-shadow(0 0 calc(6 * var(--u)) var(--halo));
 }
-.item svg.arrow { width: calc(32 * var(--b)); height: calc(32 * var(--b)); margin-left: calc(-6 * var(--b)); stroke-width: 3; }
-.item svg.arrow.up { transform: rotate(180deg); }
-.item svg.arrow.same { display: none; }
 
 /* States set by app.js on <body>: waiting (grey only), weather (clip + text), offline (image only). */
 .state-weather .text { opacity: 1; }
